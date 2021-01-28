@@ -1,0 +1,4 @@
+.env
+repo/pool/**
+repo/db/**
+repo/dists/**
