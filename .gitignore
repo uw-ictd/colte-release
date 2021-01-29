@@ -2,3 +2,6 @@
 repo/pool/**
 repo/db/**
 repo/dists/**
+
+# Ignore the temporary local working directory
+scratch/**
