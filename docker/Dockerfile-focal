@@ -1,0 +1,15 @@
+FROM ubuntu:focal
+
+# Install basic build tools:
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes build-essential git curl nodejs npm
+
+# Copy in the code and fixed entrypoint script
+COPY ./colte /colte
+COPY ./docker-entrypoint.sh /colte/docker-entrypoint.sh
+
+WORKDIR /colte
+
+RUN make get_nfpm
+
+ENTRYPOINT ["/colte/docker-entrypoint.sh", "focal"]
