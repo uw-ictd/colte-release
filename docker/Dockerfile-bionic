@@ -18,4 +18,4 @@ WORKDIR /colte
 
 RUN make get_nfpm
 
-ENTRYPOINT ["/colte/docker-entrypoint.sh", "bionic"]
+ENTRYPOINT ["/colte/docker-entrypoint.sh", "ubuntu18.04", "bionic"]

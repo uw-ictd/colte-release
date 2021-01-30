@@ -12,4 +12,4 @@ WORKDIR /colte
 
 RUN make get_nfpm
 
-ENTRYPOINT ["/colte/docker-entrypoint.sh", "buster"]
+ENTRYPOINT ["/colte/docker-entrypoint.sh", "debian10", "buster"]
