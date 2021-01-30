@@ -17,7 +17,7 @@ SignWith: B2A72160B151CB88D84F6B24EA014307B38F63CC 1ED66456DF2F145090D9E144DB21A
 
 Origin: colte-archive
 Label: colte-archive
-Codename: fossa
+Codename: focal
 Architectures: amd64 arm64
 Components: main
 Description: Apt repository for the CoLTE community cellular project at UW
