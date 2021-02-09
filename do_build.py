@@ -54,7 +54,7 @@ def _setup_workspace(workspace_path):
     shutil.copy(Path("docker/docker-entrypoint.sh"), workspace_path.joinpath(Path("docker-entrypoint.sh")))
 
 def _build_docker_image(base_build_path, dockerfile, image_tag):
-    subprocess.run(["docker", "build", "-f", dockerfile, "--tag", image_tag, base_build_path])
+    subprocess.run(["docker", "build", "-f", dockerfile, "--tag", image_tag, base_build_path], check=True)
 
 def _run_dockerized_build(workspace_path, image_tag):
     host_bind_path = workspace_path.joinpath("build-volume").resolve()
@@ -66,7 +66,8 @@ def _run_dockerized_build(workspace_path, image_tag):
          "{}:/build-volume".format(str(host_bind_path)),
          image_tag,
          str(os.getuid())
-         ])
+        ],
+        check=True)
 
 def _run_build_python_subprocess(workspace_path, repo_path):
     """Runs a repo's python build subprocess and collects the results in the
