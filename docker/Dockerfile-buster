@@ -2,7 +2,7 @@ FROM debian:buster
 
 # Install basic build tools:
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes build-essential git curl nodejs npm
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes build-essential git curl nodejs npm gettext-base
 
 # Copy in the code and fixed entrypoint script
 COPY ./colte /colte

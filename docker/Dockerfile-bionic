@@ -2,7 +2,8 @@ FROM ubuntu:bionic
 
 # Install basic build tools:
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes build-essential git curl
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes build-essential git curl apt-utils
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes gettext-base
 
 # Install nodejs:
 RUN curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -

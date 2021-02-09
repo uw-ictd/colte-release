@@ -13,7 +13,7 @@ DISTRO_RELEASE_CODENAME=$2
 OUT_USER=$3
 
 # Buildthe package
-DISTRO_RELEASE_VERSION=$DISTRO_RELEASE_VERSION make all
+DISTRO_RELEASE_VERSION=$DISTRO_RELEASE_VERSION make package_arm64 package_x86_64
 
 # Copy the built packages to the mounted output volume
 mkdir -p /build-volume/"${DISTRO_RELEASE_CODENAME}"
