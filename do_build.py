@@ -77,11 +77,26 @@ def _run_build_python_subprocess(workspace_path, repo_path):
     subprocess.run(["python3", "pkg/build_all.py"], cwd=repo_path, check=True)
 
     # Copy the build results to the shared output directory.
-    shutil.copytree(
+    _copy_built_debs(
         repo_path.joinpath(Path("build")),
-        workspace_path.joinpath(Path("build-volume")),
-        dirs_exist_ok=True,
+        workspace_path.joinpath(Path("build-volume"))
     )
+
+
+def _copy_built_debs(src, dst):
+    """Copies debs built in per-distribution directories into per-distribution
+    destinations. This could be replaced with shutil.copytree after python3.8.
+    """
+    dist_names = os.listdir(src)
+    for dist in dist_names:
+        src_dir = src.joinpath(dist)
+        dst_dir = dst.joinpath(dist)
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        debs = os.listdir(src_dir)
+        for deb in debs:
+            src_deb_path = os.path.join(src_dir, deb)
+            dst_deb_path = os.path.join(dst_dir, deb)
+            shutil.copy(src_deb_path, dst_deb_path)
 
 
 def main(workspace_path):
