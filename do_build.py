@@ -17,9 +17,10 @@ import shutil
 import subprocess
 
 Repo = namedtuple("Repo", ["local_path", "url"])
-REPOS = [
-    Repo(local_path="colte", url="https://github.com/uw-ictd/colte.git"),
-]
+REPOS = {
+    "colte": Repo(local_path="colte", url="https://github.com/uw-ictd/colte.git"),
+    "haulage": Repo(local_path="haulage", url="https://github.com/uw-ictd/haulage.git")
+}
 
 DISTRIBUTIONS = ["buster", "bionic", "focal"]
 
@@ -67,11 +68,27 @@ def _run_dockerized_build(workspace_path, image_tag):
          str(os.getuid())
          ])
 
+def _run_build_python_subprocess(workspace_path, repo_path):
+    """Runs a repo's python build subprocess and collects the results in the
+    shared build volume.
+    """
+    # Build the repo's packages
+    subprocess.run(["python3", "pkg/build_all.py"], cwd=repo_path, check=True)
+
+    # Copy the build results to the shared output directory.
+    shutil.copytree(
+        repo_path.joinpath(Path("build")),
+        workspace_path.joinpath(Path("build-volume")),
+        dirs_exist_ok=True,
+    )
+
+
 def main(workspace_path):
     parser = argparse.ArgumentParser()
     specifier_group = parser.add_mutually_exclusive_group(required=True)
     specifier_group.add_argument("--tag", help="The tag to build")
     specifier_group.add_argument("--main", action="store_true", help="Build the latest main branch")
+    parser.add_argument("--haulageTag", help="The haulage tag to build")
     parser.add_argument("--clean", action="store_true", help="Force a clean build, removing existing intermediates")
     args = parser.parse_args()
     log.debug("Parsed args {}".format(args))
@@ -80,6 +97,7 @@ def main(workspace_path):
         ref_label = "master"
     else:
         ref_label = args.tag
+        haulage_ref_label = args.haulageTag
 
     if args.clean:
         if workspace_path.exists():
@@ -90,9 +108,10 @@ def main(workspace_path):
 
     _setup_workspace(workspace_path)
 
-    for repo in REPOS:
-        _checkout_repo(workspace_path=workspace_path, repo=repo, ref_label=ref_label)
+    _checkout_repo(workspace_path=workspace_path, repo=REPOS["colte"], ref_label=ref_label)
+    _checkout_repo(workspace_path=workspace_path, repo=REPOS["haulage"], ref_label=haulage_ref_label)
 
+    # Build CoLTE
     for distro in DISTRIBUTIONS:
         image_name = "colte/{}-build-local".format(distro)
         _build_docker_image(
@@ -101,6 +120,13 @@ def main(workspace_path):
             image_tag=image_name,
         )
         _run_dockerized_build(workspace_path, image_tag=image_name)
+
+    # Build Haulage
+    _run_build_python_subprocess(
+        workspace_path=workspace_path,
+        repo_path=workspace_path.joinpath(REPOS["haulage"].local_path)
+    )
+
 
 if __name__ == "__main__":
     logging.basicConfig()
