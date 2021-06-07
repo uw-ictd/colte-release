@@ -101,18 +101,24 @@ def _copy_built_debs(src, dst):
 
 def main(workspace_path):
     parser = argparse.ArgumentParser()
-    specifier_group = parser.add_mutually_exclusive_group(required=True)
-    specifier_group.add_argument("--tag", help="The tag to build")
-    specifier_group.add_argument("--main", action="store_true", help="Build the latest main branch")
-    parser.add_argument("--haulageTag", help="The haulage tag to build")
+    parser.add_argument("--main", action="store_true", help="Build the latest main branch")
+    tag_group = parser.add_argument_group("tags", "The specific tags for each subproject")
+    tag_group.add_argument("--colteTag", help="The colte tag to build")
+    tag_group.add_argument("--haulageTag", help="The haulage tag to build")
     parser.add_argument("--clean", action="store_true", help="Force a clean build, removing existing intermediates")
     args = parser.parse_args()
     log.debug("Parsed args {}".format(args))
 
     if args.main:
-        ref_label = "main"
+        if args.colteTag is not None or args.haulageTag is not None:
+            parser.error("--main cannot be used at the same time as a *Tag argument")
+
+        colte_ref_label = "main"
+        haulage_ref_label = "master"
     else:
-        ref_label = args.tag
+        if args.colteTag is None or args.haulageTag is None:
+            parser.error("either --main must be specified or all *Tag arguments provided")
+        colte_ref_label = args.colteTag
         haulage_ref_label = args.haulageTag
 
     if args.clean:
@@ -124,7 +130,7 @@ def main(workspace_path):
 
     _setup_workspace(workspace_path)
 
-    _checkout_repo(workspace_path=workspace_path, repo=REPOS["colte"], ref_label=ref_label)
+    _checkout_repo(workspace_path=workspace_path, repo=REPOS["colte"], ref_label=colte_ref_label)
     _checkout_repo(workspace_path=workspace_path, repo=REPOS["haulage"], ref_label=haulage_ref_label)
 
     # Build CoLTE
