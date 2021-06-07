@@ -110,7 +110,7 @@ def main(workspace_path):
     log.debug("Parsed args {}".format(args))
 
     if args.main:
-        ref_label = "master"
+        ref_label = "main"
     else:
         ref_label = args.tag
         haulage_ref_label = args.haulageTag
