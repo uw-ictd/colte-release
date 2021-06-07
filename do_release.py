@@ -11,7 +11,7 @@ from pathlib import Path
 import logging
 import subprocess
 
-DISTRIBUTIONS = ["buster", "bionic", "focal"]
+DISTRIBUTIONS = ["buster", "bionic", "focal", "bullseye"]
 
 def main(workspace_path):
     repo_path = Path("repo").resolve()
