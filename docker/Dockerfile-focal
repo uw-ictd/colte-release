@@ -5,6 +5,9 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes apt-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes build-essential git curl nodejs npm gettext-base
 
+# Install npm 7
+RUN npm install -g npm@7
+
 # Copy in the code and fixed entrypoint script
 COPY ./colte /colte
 COPY ./docker-entrypoint.sh /colte/docker-entrypoint.sh
