@@ -86,7 +86,9 @@ def _run_build_python_subprocess(workspace_path, repo_path):
     shared build volume.
     """
     # Build the repo's packages
-    subprocess.run(["python3", "pkg/build_all.py"], cwd=repo_path, check=True)
+    subprocess.run(
+        ["python3", "pkg/crossplatform/build_all.py"], cwd=repo_path, check=True
+    )
 
     # Copy the build results to the shared output directory.
     _copy_built_debs(
