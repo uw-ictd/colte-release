@@ -19,13 +19,14 @@ import subprocess
 Repo = namedtuple("Repo", ["local_path", "url"])
 REPOS = {
     "colte": Repo(local_path="colte", url="https://github.com/uw-ictd/colte.git"),
-    "haulage": Repo(local_path="haulage", url="https://github.com/uw-ictd/haulage.git")
+    "haulage": Repo(local_path="haulage", url="https://github.com/uw-ictd/haulage.git"),
 }
 
 DISTRIBUTIONS = ["buster", "bionic", "focal", "bullseye"]
 
+
 def _checkout_repo(workspace_path, repo, ref_label):
-    """ Check out a given ref_label at local path, respecting existing repos.
+    """Check out a given ref_label at local path, respecting existing repos.
 
     This assumes if a directory is already present at the desired path, that it
     is an earlier version of the correct git repo.
@@ -42,32 +43,43 @@ def _checkout_repo(workspace_path, repo, ref_label):
     # Checkout the appropriate ref
     subprocess.run(["git", "checkout", ref_label], cwd=local_path, check=True)
 
+
 def _setup_workspace(workspace_path):
-    """ Setup a barebones workspace with the correct directory structure and files.
-    """
+    """Setup a barebones workspace with the correct directory structure and files."""
     workspace_path.mkdir(parents=True, exist_ok=True)
 
     # Make a directory to bind mount into the containers for output
     Path(workspace_path.joinpath("build-volume")).mkdir(parents=True, exist_ok=True)
 
     # Copy needed files from this repo into the workspace
-    shutil.copy(Path("docker/docker-entrypoint.sh"), workspace_path.joinpath(Path("docker-entrypoint.sh")))
+    shutil.copy(
+        Path("docker/docker-entrypoint.sh"),
+        workspace_path.joinpath(Path("docker-entrypoint.sh")),
+    )
+
 
 def _build_docker_image(base_build_path, dockerfile, image_tag):
-    subprocess.run(["docker", "build", "-f", dockerfile, "--tag", image_tag, base_build_path], check=True)
+    subprocess.run(
+        ["docker", "build", "-f", dockerfile, "--tag", image_tag, base_build_path],
+        check=True,
+    )
+
 
 def _run_dockerized_build(workspace_path, image_tag):
     host_bind_path = workspace_path.joinpath("build-volume").resolve()
 
     subprocess.run(
-        ["docker",
-         "run",
-         "-v",
-         "{}:/build-volume".format(str(host_bind_path)),
-         image_tag,
-         str(os.getuid())
+        [
+            "docker",
+            "run",
+            "-v",
+            "{}:/build-volume".format(str(host_bind_path)),
+            image_tag,
+            str(os.getuid()),
         ],
-        check=True)
+        check=True,
+    )
+
 
 def _run_build_python_subprocess(workspace_path, repo_path):
     """Runs a repo's python build subprocess and collects the results in the
@@ -78,8 +90,7 @@ def _run_build_python_subprocess(workspace_path, repo_path):
 
     # Copy the build results to the shared output directory.
     _copy_built_debs(
-        repo_path.joinpath(Path("build")),
-        workspace_path.joinpath(Path("build-volume"))
+        repo_path.joinpath(Path("build")), workspace_path.joinpath(Path("build-volume"))
     )
 
 
@@ -101,11 +112,19 @@ def _copy_built_debs(src, dst):
 
 def main(workspace_path):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--main", action="store_true", help="Build the latest main branch")
-    tag_group = parser.add_argument_group("tags", "The specific tags for each subproject")
+    parser.add_argument(
+        "--main", action="store_true", help="Build the latest main branch"
+    )
+    tag_group = parser.add_argument_group(
+        "tags", "The specific tags for each subproject"
+    )
     tag_group.add_argument("--colteTag", help="The colte tag to build")
     tag_group.add_argument("--haulageTag", help="The haulage tag to build")
-    parser.add_argument("--clean", action="store_true", help="Force a clean build, removing existing intermediates")
+    parser.add_argument(
+        "--clean",
+        action="store_true",
+        help="Force a clean build, removing existing intermediates",
+    )
     args = parser.parse_args()
     log.debug("Parsed args {}".format(args))
 
@@ -117,21 +136,37 @@ def main(workspace_path):
         haulage_ref_label = "master"
     else:
         if args.colteTag is None or args.haulageTag is None:
-            parser.error("either --main must be specified or all *Tag arguments provided")
+            parser.error(
+                "either --main must be specified or all *Tag arguments provided"
+            )
         colte_ref_label = args.colteTag
         haulage_ref_label = args.haulageTag
 
     if args.clean:
         if workspace_path.exists():
-            log.warning("Removing existing tree at '{}' due to clean request".format(workspace_path.resolve()))
+            log.warning(
+                "Removing existing tree at '{}' due to clean request".format(
+                    workspace_path.resolve()
+                )
+            )
             shutil.rmtree(workspace_path)
         else:
-            log.info("Clean requested, but no clean to do for path '{}'".format(workspace_path.resolve()))
+            log.info(
+                "Clean requested, but no clean to do for path '{}'".format(
+                    workspace_path.resolve()
+                )
+            )
 
     _setup_workspace(workspace_path)
 
-    _checkout_repo(workspace_path=workspace_path, repo=REPOS["colte"], ref_label=colte_ref_label)
-    _checkout_repo(workspace_path=workspace_path, repo=REPOS["haulage"], ref_label=haulage_ref_label)
+    _checkout_repo(
+        workspace_path=workspace_path, repo=REPOS["colte"], ref_label=colte_ref_label
+    )
+    _checkout_repo(
+        workspace_path=workspace_path,
+        repo=REPOS["haulage"],
+        ref_label=haulage_ref_label,
+    )
 
     # Build CoLTE
     for distro in DISTRIBUTIONS:
@@ -146,7 +181,7 @@ def main(workspace_path):
     # Build Haulage
     _run_build_python_subprocess(
         workspace_path=workspace_path,
-        repo_path=workspace_path.joinpath(REPOS["haulage"].local_path)
+        repo_path=workspace_path.joinpath(REPOS["haulage"].local_path),
     )
 
 
