@@ -22,7 +22,7 @@ REPOS = {
     "haulage": Repo(local_path="haulage", url="https://github.com/uw-ictd/haulage.git"),
 }
 
-DISTRIBUTIONS = ["buster", "bionic", "focal", "bullseye"]
+DISTRIBUTIONS = ["buster", "bionic", "focal", "jammy", "bullseye"]
 
 
 def _checkout_repo(workspace_path, repo, ref_label):
