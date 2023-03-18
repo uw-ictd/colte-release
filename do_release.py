@@ -6,12 +6,11 @@ It attempts to only use python3 standard library functions for portability, but
 assumes the host system has python3 and has access to reprepro on the user PATH.
 """
 
-from pathlib import Path
-
 import logging
 import subprocess
+from pathlib import Path
 
-DISTRIBUTIONS = ["buster", "bionic", "focal", "bullseye"]
+from constants import DISTRIBUTIONS
 
 
 def main(workspace_path):

@@ -7,22 +7,21 @@ It attempts to only use python3 standard library functions for portability, but
 assumes the host system has python3 and has access to git on the user PATH.
 """
 
-from collections import namedtuple
-from pathlib import Path
-
 import argparse
 import logging
 import os
 import shutil
 import subprocess
+from collections import namedtuple
+from pathlib import Path
+
+from constants import DISTRIBUTIONS
 
 Repo = namedtuple("Repo", ["local_path", "url"])
 REPOS = {
     "colte": Repo(local_path="colte", url="https://github.com/uw-ictd/colte.git"),
     "haulage": Repo(local_path="haulage", url="https://github.com/uw-ictd/haulage.git"),
 }
-
-DISTRIBUTIONS = ["buster", "bionic", "focal", "jammy", "bullseye"]
 
 
 def _checkout_repo(workspace_path, repo, ref_label):
@@ -135,7 +134,7 @@ def main(workspace_path):
             parser.error("--main cannot be used at the same time as a *Tag argument")
 
         colte_ref_label = "main"
-        haulage_ref_label = "master"
+        haulage_ref_label = "main"
     else:
         if args.colteTag is None or args.haulageTag is None:
             parser.error(
