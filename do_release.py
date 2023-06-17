@@ -21,7 +21,7 @@ def main(workspace_path):
 
         for deb in debs:
             log.info("Adding {} to {}".format(deb, distro))
-            subprocess.run(
+            output = subprocess.run(
                 [
                     "reprepro",
                     "--basedir",
@@ -31,7 +31,16 @@ def main(workspace_path):
                     deb.resolve(),
                 ],
                 cwd=repo_path,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
             )
+            if (
+                output.returncode != 0
+                and "Already existing files can only be included again, if they are the same, but:"
+                not in output.stderr
+            ):
+                print(output.stderr)
 
     # Do the final export!
     subprocess.run(
