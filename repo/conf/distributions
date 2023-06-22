@@ -13,7 +13,7 @@ Codename: bionic
 Architectures: amd64 arm64
 Components: main
 Description: Apt repository for the CoLTE community cellular project at UW
-SignWith: B2A72160B151CB88D84F6B24EA014307B38F63CC 1ED66456DF2F145090D9E144DB21A5454D611150
+SignWith: B2A72160B151CB88D84F6B24EA014307B38F63CC
 
 Origin: colte-archive
 Label: colte-archive
@@ -26,6 +26,14 @@ SignWith: B2A72160B151CB88D84F6B24EA014307B38F63CC
 Origin: colte-archive
 Label: colte-archive
 Codename: bullseye
+Architectures: amd64 arm64
+Components: main
+Description: Apt repository for the CoLTE community cellular project at UW
+SignWith: B2A72160B151CB88D84F6B24EA014307B38F63CC
+
+Origin: colte-archive
+Label: colte-archive
+Codename: jammy
 Architectures: amd64 arm64
 Components: main
 Description: Apt repository for the CoLTE community cellular project at UW
